@@ -1,0 +1,256 @@
+{
+  "name": "AI Study Notes & Quiz Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Study Notes & Quiz Generator",
+        "formDescription": "Enter your email address and study topic. Our AI will generate comprehensive study notes and a multiple-choice quiz, then organize everything into a Google Document for easy review and learning.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Topic:",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email ID:",
+              "fieldType": "email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "5bdbd5b8-ebe1-465f-9e06-aaa7cc1520e7",
+      "name": "On form submission",
+      "webhookId": "729751ff-4e0d-4413-9df3-d52ea77b3676"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        -80
+      ],
+      "id": "342a3ec0-4106-48d0-9235-8a5095d0bd59",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        432
+      ],
+      "id": "03b5ce9c-f0b4-4af5-bdb9-85a717a05dde",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate comprehensive study notes for the following topic.\n\nTopic:\n{{ $json['Topic:'] }}\n\nThe notes should include:\n\n* Introduction\n* Definition\n* Key Concepts\n* Important Features\n* Advantages\n* Disadvantages (if applicable)\n* Real-world Applications\n* Best Practices (if applicable)\n* Summary\n\nUse clear headings and organize the content logically. Return the output as clean HTML only.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert educator and technical writer.\n\nYour task is to generate accurate, well-structured, and easy-to-understand study notes based on the user's topic.\n\nAlways follow these rules:\n\n1. Return the output as an HTML fragment only.\n2. Do NOT generate a complete HTML document.\n3. Never include `<html>`, `<head>`, `<body>`, `<style>`, or `<script>` tags.\n4. Use semantic HTML only.\n5. Structure the notes using headings, paragraphs, bullet lists, numbered lists, and tables only when appropriate.\n6. Explain concepts clearly using simple language.\n7. Organize the notes from basic concepts to advanced concepts.\n8. Highlight important terms using `<strong>`.\n9. Avoid unnecessary repetition.\n10. Do not include Markdown or code blocks.\n11. Return only the HTML fragment.\n12. Make the notes suitable for direct insertion into a Google Document.\n\nOutput Format:\n\n<h1>Topic Name</h1>\n\n<p>Brief introduction to the topic.</p>\n\n<h2>Definition</h2>\n<p>Definition of the topic.</p>\n\n<h2>Key Concepts</h2>\n<ul>\n  <li>Concept 1</li>\n  <li>Concept 2</li>\n  <li>Concept 3</li>\n</ul>\n\n<h2>Main Features</h2>\n<ul>\n  <li>Feature 1</li>\n  <li>Feature 2</li>\n  <li>Feature 3</li>\n</ul>\n\n<h2>Advantages</h2>\n<ul>\n  <li>Advantage 1</li>\n  <li>Advantage 2</li>\n</ul>\n\n<h2>Disadvantages</h2>\n<ul>\n  <li>Disadvantage 1</li>\n  <li>Disadvantage 2</li>\n</ul>\n\n<h2>Real-World Applications</h2>\n<ul>\n  <li>Application 1</li>\n  <li>Application 2</li>\n  <li>Application 3</li>\n</ul>\n\n<h2>Best Practices</h2>\n<ul>\n  <li>Practice 1</li>\n  <li>Practice 2</li>\n</ul>\n\n<h2>Summary</h2>\n<p>A concise summary of the topic.</p>\n\nReturn only this HTML structure. Do not generate Markdown, CSS, JavaScript, or a complete HTML document.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -48,
+        -304
+      ],
+      "id": "904b1464-6693-40a3-b372-a997f834c772",
+      "name": "Notes Generator"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a multiple-choice quiz for the following topic.\n\nTopic:\n{{ $json['Topic:']}}\n\nRequirements:\n\n* Create exactly 10 questions.\n* Each question should have four options (A, B, C, and D).\n* Indicate the correct answer.\n* Include a one- or two-sentence explanation after each answer.\n* Cover different aspects of the topic.\n* Arrange the questions from easy to difficult.\n* Return the output as clean HTML only.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert assessment creator.\n\nYour task is to generate high-quality multiple-choice questions based on the user's topic.\n\nAlways follow these rules:\n\n1. Return the output as an HTML fragment only.\n2. Never generate `<html>`, `<head>`, `<body>`, `<style>`, or `<script>` tags.\n3. Generate exactly 10 multiple-choice questions.\n4. Each question must have exactly four options labeled A, B, C, and D.\n5. Clearly indicate the correct answer after each question.\n6. Provide a brief explanation of why the answer is correct.\n7. Use semantic HTML with headings, paragraphs, ordered lists, unordered lists, and `<strong>` where appropriate.\n8. Do not use Markdown.\n9. Return only the HTML fragment.\n10. Make the output suitable for direct insertion into a Google Document.\n\nOutput Format:\n\n<h1>Multiple Choice Questions</h1>\n\n<h2>Question 1</h2>\n\n<p>Write the complete question here.</p>\n\n<ul>\n  <li>A. Option A</li>\n  <li>B. Option B</li>\n  <li>C. Option C</li>\n  <li>D. Option D</li>\n</ul>\n\n<p><strong>Correct Answer:</strong> A. Option A</p>\n\n<hr>\n\n<h2>Question 2</h2>\n\n<p>Write the complete question here.</p>\n\n<ul>\n  <li>A. Option A</li>\n  <li>B. Option B</li>\n  <li>C. Option C</li>\n  <li>D. Option D</li>\n</ul>\n\n<p><strong>Correct Answer:</strong> C. Option C</p>\n\n<hr>\n\nContinue this exact structure until Question 10.\n\nRequirements:\n\n* Generate exactly 10 questions.\n* Each question must have exactly four options labeled A, B, C, and D.\n* Display the correct answer immediately after the options.\n* Do not include explanations unless explicitly requested.\n* Return only the HTML fragment.\n* Do not generate `<html>`, `<head>`, `<body>`, `<style>`, `<script>`, or Markdown.\n\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -48,
+        208
+      ],
+      "id": "a6d882fd-2046-48ae-ab64-e102c576892a",
+      "name": "Q & A Generator"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$('On form submission').item.json['Email ID:'] }}",
+        "subject": "=Notes Ready For {{ $('On form submission').item.json['Topic:'] }}",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        -208
+      ],
+      "id": "7faafe50-0863-4f24-85f4-a9e59f9181cf",
+      "name": "Send a message",
+      "webhookId": "71b1d03a-bf84-4e8b-a2b9-69cda80a0531",
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$('On form submission').item.json['Email ID:'] }}",
+        "subject": "=MCQs Ready For {{ $('On form submission').item.json['Topic:'] }}",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        112
+      ],
+      "id": "ba4de423-9e9a-490d-943c-4230e27de873",
+      "name": "Send a message1",
+      "webhookId": "71b1d03a-bf84-4e8b-a2b9-69cda80a0531",
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Notes Generator",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Q & A Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Notes Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Q & A Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Q & A Generator": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notes Generator": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}
